@@ -14,17 +14,23 @@ export default async function HomePage() {
   let clientName: string | null = null;
 
   if (session.role === "admin") {
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("clients")
       .select("id, name")
       .order("name", { ascending: true });
+    if (error) {
+      console.error("Erro ao buscar clients no Supabase:", error);
+    }
     clients = data ?? [];
   } else if (session.clientId) {
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("clients")
       .select("id, name")
       .eq("id", session.clientId)
       .maybeSingle();
+    if (error) {
+      console.error("Erro ao buscar client no Supabase:", error);
+    }
     clientName = data?.name ?? null;
   }
 
