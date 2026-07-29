@@ -76,6 +76,17 @@ DRIVE_FIELD_NAMES = ("Link Drive", "LINK DRIVE", "Link")
 DATE_FIELD_NAMES = ("Postagem",)
 
 
+def generate_access_code(name):
+    """Gera um código de acesso legível a partir do nome do cliente, ex: 'A FAVORITA' -> 'a-favorita-7f3a'."""
+    import secrets
+    import unicodedata
+
+    normalized = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")
+    suffix = secrets.token_hex(2)  # 4 caracteres hex, evita colisão
+    return f"{slug}-{suffix}"
+
+
 # ---------------------------------------------------------------------------
 # .env loading (sem dependências externas)
 # ---------------------------------------------------------------------------
@@ -258,6 +269,23 @@ class Supabase:
             sys.exit(f"Erro ao gravar em `{table}`: {resp.status_code} {resp.text}")
         return resp.json() if returning else []
 
+    def insert(self, table, rows, returning=True):
+        if not rows:
+            return []
+        headers = dict(self.headers)
+        if returning:
+            headers["Prefer"] = "return=representation"
+        resp = requests.post(f"{self.base}/{table}", headers=headers, json=rows)
+        if not resp.ok:
+            sys.exit(f"Erro ao inserir em `{table}`: {resp.status_code} {resp.text}")
+        return resp.json() if returning else []
+
+    def patch(self, table, filters, update):
+        params = dict(filters)
+        resp = requests.patch(f"{self.base}/{table}", headers=self.headers, params=params, json=update)
+        if not resp.ok:
+            sys.exit(f"Erro ao atualizar `{table}`: {resp.status_code} {resp.text}")
+
     def select(self, table, params):
         resp = requests.get(f"{self.base}/{table}", headers=self.headers, params=params)
         if not resp.ok:
@@ -327,15 +355,36 @@ def main():
     sb = Supabase(env["NEXT_PUBLIC_SUPABASE_URL"], env["SUPABASE_SERVICE_ROLE_KEY"])
 
     print("\nGravando clientes no Supabase...")
-    saved_clients = sb.upsert("clients", clients, on_conflict="clickup_list_id")
-    list_id_to_client_id = {c["clickup_list_id"]: c["id"] for c in saved_clients}
+    all_list_ids = [c["clickup_list_id"] for c in clients]
+    existing = sb.select(
+        "clients",
+        {"clickup_list_id": f"in.({','.join(all_list_ids)})", "select": "id,clickup_list_id,name,access_code"},
+    )
+    existing_by_list = {c["clickup_list_id"]: c for c in existing}
 
-    # upsert não retorna linhas que já existiam sem mudança em algumas versões do PostgREST;
-    # para garantir, buscamos de novo todos os clients pelos clickup_list_id usados.
-    if len(list_id_to_client_id) < len(clients):
-        all_list_ids = [c["clickup_list_id"] for c in clients]
-        fetched = sb.select("clients", {"clickup_list_id": f"in.({','.join(all_list_ids)})", "select": "id,clickup_list_id"})
-        list_id_to_client_id.update({c["clickup_list_id"]: c["id"] for c in fetched})
+    new_clients = [c for c in clients if c["clickup_list_id"] not in existing_by_list]
+    for c in new_clients:
+        c["access_code"] = generate_access_code(c["name"])
+
+    inserted = sb.insert("clients", new_clients) if new_clients else []
+    if new_clients:
+        print(f"  {len(inserted)} cliente(s) novo(s) criado(s):")
+        for c in inserted:
+            print(f"    {c['name']} -> código de acesso: {c['access_code']}")
+
+    # atualiza o nome de clientes que já existiam, se mudou no ClickUp (nunca mexe no access_code)
+    renamed = 0
+    for c in clients:
+        prev = existing_by_list.get(c["clickup_list_id"])
+        if prev and prev["name"] != c["name"]:
+            sb.patch("clients", {"id": f"eq.{prev['id']}"}, {"name": c["name"]})
+            renamed += 1
+    if renamed:
+        print(f"  {renamed} cliente(s) com nome atualizado.")
+
+    list_id_to_client_id = {lid: c["id"] for lid, c in existing_by_list.items()}
+    list_id_to_client_id.update({c["clickup_list_id"]: c["id"] for c in inserted})
+
 
     for p in posts:
         p["client_id"] = list_id_to_client_id.get(p["clickup_list_id"])
