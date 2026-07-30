@@ -4,12 +4,20 @@
 
 html,
 body {
-  background-color: #0a0a0a;
+  background-color: #0b0b0e;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse 900px 500px at 12% -10%, rgba(225, 38, 28, 0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(240, 180, 41, 0.05), transparent 55%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #333 transparent;
+  scrollbar-color: rgba(243, 241, 236, 0.18) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -18,7 +26,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #333;
+  background-color: rgba(243, 241, 236, 0.18);
   border-radius: 9999px;
 }
 
@@ -28,6 +36,60 @@ body {
   }
   .animate-fade-scale-out {
     animation: fadeScaleOut 150ms ease-in forwards;
+  }
+
+  /* Viewfinder corner marks — the calendar's signature detail.
+     Four small L-shaped brackets, like a contact-sheet / camera frame,
+     used on today's cell and revealed on hover of any day cell. */
+  .viewfinder {
+    position: relative;
+  }
+  .viewfinder::before,
+  .viewfinder::after,
+  .viewfinder .vf-tr,
+  .viewfinder .vf-br {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-color: currentColor;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+  .viewfinder::before {
+    top: 4px;
+    left: 4px;
+    border-top: 1.5px solid;
+    border-left: 1.5px solid;
+  }
+  .viewfinder::after {
+    bottom: 4px;
+    left: 4px;
+    border-bottom: 1.5px solid;
+    border-left: 1.5px solid;
+  }
+  .viewfinder .vf-tr {
+    top: 4px;
+    right: 4px;
+    border-top: 1.5px solid;
+    border-right: 1.5px solid;
+  }
+  .viewfinder .vf-br {
+    bottom: 4px;
+    right: 4px;
+    border-bottom: 1.5px solid;
+    border-right: 1.5px solid;
+  }
+  .viewfinder:hover::before,
+  .viewfinder:hover::after,
+  .viewfinder:hover .vf-tr,
+  .viewfinder:hover .vf-br,
+  .viewfinder-active::before,
+  .viewfinder-active::after,
+  .viewfinder-active .vf-tr,
+  .viewfinder-active .vf-br {
+    opacity: 1;
   }
 }
 
