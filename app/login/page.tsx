@@ -39,32 +39,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center gap-5 mb-8">
-          <Logo size="lg" />
-          <div className="text-center">
-            <p className="font-mono text-[10px] tracking-widest2 uppercase text-ink-faint mb-2">
-              Área do cliente
-            </p>
-            <h1 className="font-display italic text-3xl leading-none">
-              N1 Company
-            </h1>
-            <p className="text-sm text-ink-muted mt-2">
-              Calendário de conteúdo para Instagram
-            </p>
-          </div>
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white/[0.03] border border-white/10 p-8 flex flex-col items-center gap-6">
+        <Logo size="lg" />
+        <div className="text-center">
+          <h1 className="text-xl font-bold">N1 Company</h1>
+          <p className="text-sm text-white/50 mt-1">
+            Calendário de conteúdo Instagram
+          </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-5 rounded-2xl bg-surface border border-line p-7 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]"
-        >
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label
-              htmlFor="code"
-              className="font-mono text-[10px] tracking-widest2 uppercase text-ink-muted"
-            >
+            <label htmlFor="code" className="text-sm text-white/70">
               Código de acesso
             </label>
             <input
@@ -73,8 +60,8 @@ export default function LoginPage() {
               autoFocus
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-xl bg-surface-raised border border-line px-4 py-3 text-ink placeholder-ink-faint outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition"
+              placeholder="Digite seu código"
+              className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition"
             />
           </div>
 
@@ -87,15 +74,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-brand-red hover:bg-brand-red/90 disabled:opacity-60 disabled:cursor-not-allowed transition font-semibold py-3 tracking-wide"
+            className="w-full rounded-xl bg-brand-red hover:bg-brand-red/90 disabled:opacity-60 disabled:cursor-not-allowed transition font-bold py-3"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
-
-        <p className="text-center font-mono text-[10px] tracking-widest2 uppercase text-ink-faint mt-6">
-          N1 Company · Instagram
-        </p>
       </div>
     </main>
   );
