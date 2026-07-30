@@ -14,12 +14,6 @@ import {
 } from "@/lib/dateUtils";
 import type { Client, Post } from "@/types";
 
-const STATUS_LEGEND: { status: Post["status"]; color: string }[] = [
-  { status: "Pendente", color: "#E1261C" },
-  { status: "Aprovado", color: "#F0B429" },
-  { status: "Publicado", color: "#2FBE72" },
-];
-
 export default function CalendarApp({
   role,
   clients,
@@ -201,15 +195,13 @@ export default function CalendarApp({
   }, [posts]);
 
   return (
-    <main className="min-h-screen pb-16">
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-line px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <main className="min-h-screen bg-background pb-16">
+      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-white/10 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Logo size="sm" />
           <div className="leading-tight">
-            <p className="font-display italic text-base sm:text-lg leading-none">
-              N1 Company
-            </p>
-            <p className="font-mono text-[10px] tracking-widest2 uppercase text-ink-faint mt-1">
+            <p className="font-bold text-sm sm:text-base">N1 Company</p>
+            <p className="text-[11px] sm:text-xs text-white/50">
               {role === "admin" ? "Admin" : clientName ?? "Cliente"}
             </p>
           </div>
@@ -220,13 +212,13 @@ export default function CalendarApp({
             <select
               value={clientId ?? ""}
               onChange={(e) => setClientId(e.target.value || null)}
-              className="rounded-xl bg-surface border border-line px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-red max-w-[160px] sm:max-w-none"
+              className="rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-red max-w-[160px] sm:max-w-none"
             >
-              <option value="" disabled className="bg-surface">
+              <option value="" disabled className="bg-[#141414]">
                 Selecione um cliente
               </option>
               {clients.map((c) => (
-                <option key={c.id} value={c.id} className="bg-surface">
+                <option key={c.id} value={c.id} className="bg-[#141414]">
                   {c.name}
                 </option>
               ))}
@@ -234,52 +226,32 @@ export default function CalendarApp({
           )}
           <button
             onClick={handleLogout}
-            className="rounded-xl bg-surface hover:bg-surface-raised border border-line transition text-sm font-medium px-3 py-2"
+            className="rounded-xl bg-white/[0.06] hover:bg-white/[0.12] transition text-sm font-semibold px-3 py-2"
           >
             Sair
           </button>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 mt-8">
-        <div className="flex items-end justify-between mb-6 gap-4">
-          <div className="flex items-baseline gap-3">
-            <button
-              onClick={goPrevMonth}
-              aria-label="Mês anterior"
-              className="rounded-xl bg-surface hover:bg-surface-raised border border-line transition w-9 h-9 flex items-center justify-center text-lg text-ink-muted shrink-0"
-            >
-              ‹
-            </button>
-            <h1 className="font-display italic text-3xl sm:text-4xl leading-none whitespace-nowrap">
-              {MONTH_LABELS[cursor.month - 1]}
-            </h1>
-            <span className="font-mono text-sm text-ink-faint">
-              {cursor.year}
-            </span>
-            <button
-              onClick={goNextMonth}
-              aria-label="Próximo mês"
-              className="rounded-xl bg-surface hover:bg-surface-raised border border-line transition w-9 h-9 flex items-center justify-center text-lg text-ink-muted shrink-0"
-            >
-              ›
-            </button>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-4">
-            {STATUS_LEGEND.map((s) => (
-              <span
-                key={s.status}
-                className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-widest2 uppercase text-ink-muted"
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: s.color }}
-                />
-                {s.status}
-              </span>
-            ))}
-          </div>
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={goPrevMonth}
+            aria-label="Mês anterior"
+            className="rounded-xl bg-white/[0.06] hover:bg-white/[0.12] transition w-9 h-9 flex items-center justify-center text-lg"
+          >
+            ‹
+          </button>
+          <h1 className="text-lg sm:text-2xl font-bold">
+            {MONTH_LABELS[cursor.month - 1]} {cursor.year}
+          </h1>
+          <button
+            onClick={goNextMonth}
+            aria-label="Próximo mês"
+            className="rounded-xl bg-white/[0.06] hover:bg-white/[0.12] transition w-9 h-9 flex items-center justify-center text-lg"
+          >
+            ›
+          </button>
         </div>
 
         {error && (
@@ -289,7 +261,7 @@ export default function CalendarApp({
         )}
 
         {!clientId ? (
-          <p className="text-ink-muted text-sm">
+          <p className="text-white/50 text-sm">
             Selecione um cliente para ver o calendário.
           </p>
         ) : (
@@ -299,7 +271,7 @@ export default function CalendarApp({
                 {WEEKDAY_LABELS.map((d) => (
                   <div
                     key={d}
-                    className="text-center font-mono text-[10px] tracking-widest2 uppercase text-ink-faint py-1"
+                    className="text-center text-xs font-semibold text-white/50 py-1"
                   >
                     {d}
                   </div>
@@ -323,26 +295,22 @@ export default function CalendarApp({
                         if (postId) handleDropOnDay(dateISO, postId);
                       }}
                       onClick={() => openCreateModal(dateISO)}
-                      className={`viewfinder min-h-[110px] sm:min-h-[130px] rounded-xl border p-1.5 flex flex-col gap-1 cursor-pointer transition text-brand-red ${
+                      className={`min-h-[110px] sm:min-h-[130px] rounded-xl border p-1.5 flex flex-col gap-1 cursor-pointer transition ${
                         inMonth
-                          ? "bg-surface/60 border-line"
-                          : "bg-surface/20 border-line/50 opacity-40"
+                          ? "bg-white/[0.03] border-white/10"
+                          : "bg-white/[0.01] border-white/5 opacity-40"
                       } ${
                         isToday
-                          ? "border-brand-red/40 viewfinder-active"
+                          ? "ring-2 ring-brand-red border-transparent"
                           : ""
-                      } hover:bg-surface hover:border-line-strong`}
+                      } hover:bg-white/[0.06]`}
                     >
                       <span
-                        className={`font-mono text-xs ${
-                          isToday
-                            ? "text-brand-red font-medium"
-                            : "text-ink-faint"
+                        className={`text-xs font-semibold ${
+                          isToday ? "text-brand-red" : "text-white/60"
                         }`}
                       >
-                        {String(day.getDate()).padStart(2, "0")}
-                        <span className="vf-tr" aria-hidden="true" />
-                        <span className="vf-br" aria-hidden="true" />
+                        {day.getDate()}
                       </span>
                       <div className="flex flex-col gap-1 overflow-y-auto max-h-[90px] sm:max-h-[110px]">
                         {dayPosts.map((post) => (
@@ -366,9 +334,7 @@ export default function CalendarApp({
         )}
 
         {loading && (
-          <p className="font-mono text-[10px] tracking-widest2 uppercase text-ink-faint mt-4">
-            Carregando...
-          </p>
+          <p className="text-white/40 text-sm mt-4">Carregando...</p>
         )}
       </div>
 
