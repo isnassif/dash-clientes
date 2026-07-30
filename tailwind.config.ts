@@ -8,15 +8,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0A0A0A",
+        background: "#0B0B0E",
+        surface: {
+          DEFAULT: "#15151A",
+          raised: "#1C1C22",
+        },
+        ink: {
+          DEFAULT: "#F3F1EC",
+          muted: "rgba(243,241,236,0.56)",
+          faint: "rgba(243,241,236,0.32)",
+        },
+        line: {
+          DEFAULT: "rgba(243,241,236,0.09)",
+          strong: "rgba(243,241,236,0.16)",
+        },
         brand: {
           red: "#E1261C",
-          yellow: "#FFCC33",
-          green: "#34C759",
+          gold: "#F0B429",
+          green: "#2FBE72",
+          // legacy alias kept so nothing else needs to change
+          yellow: "#F0B429",
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-fraunces)", "serif"],
+        mono: ["var(--font-plex-mono)", "monospace"],
+      },
+      letterSpacing: {
+        widest2: "0.18em",
       },
     },
   },
